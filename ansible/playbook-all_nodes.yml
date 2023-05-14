@@ -11,3 +11,9 @@
 
 - name: 'Run playbook-all_nodes-minimal_bashrc.yml'
   ansible.builtin.import_playbook: playbook-all_nodes-minimal_bashrc.yml
+
+- name: 'Run playbook-openvpn_server-install_and_configure_openvpn_server.yml'
+  ansible.builtin.import_playbook: playbook-openvpn_server-install_and_configure_openvpn_server.yml
+
+- name: 'Run playbook-openvpn_clients-install_and_configure_openvpn_client.yml'
+  ansible.builtin.import_playbook: playbook-openvpn_clients-install_and_configure_openvpn_client.yml
