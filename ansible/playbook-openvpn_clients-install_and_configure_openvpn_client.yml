@@ -1,0 +1,47 @@
+---
+- name: 'Gather facts on all VMs'
+  hosts: all
+  gather_facts: true
+  become: true
+
+- name: 'Install and configure the OpenVPN clients'
+  hosts: openvpn_clients
+  gather_facts: true
+  become: true
+
+  tasks:
+
+    - name: 'Install the openVPN package'
+      ansible.builtin.package:
+        name: openvpn
+        state: present
+
+    - name: 'Copy the shared secret file'
+      ansible.builtin.copy:
+        src: 'secret.key'
+        dest: '/etc/openvpn/secret.key'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+
+    - name: 'Create the openVPN configuration file'
+      ansible.builtin.template:
+        src: 'openvpn-client.conf.j2'
+        dest: '/etc/openvpn/client.conf'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+      notify:
+        - 'Restart the openVPN service'
+
+    - name: 'Start and enable the openVPN service'
+      ansible.builtin.service:
+        name: 'openvpn@client.service'
+        state: 'started'
+        enabled: true
+  handlers:
+
+    - name: 'Restart the openVPN service'
+      ansible.builtin.service:
+        name: 'openvpn@client.service'
+        state: 'restarted'
