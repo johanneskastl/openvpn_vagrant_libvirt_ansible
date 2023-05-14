@@ -1,0 +1,11 @@
+#
+# {{ ansible_managed }}
+#
+remote {{ hostvars['openvpn-server']['ansible_default_ipv4']['address'] }}
+dev tun
+ifconfig 10.0.0.55 10.0.0.1
+keepalive 10 60
+ping-timer-rem
+persist-tun
+persist-key
+secret secret.key
