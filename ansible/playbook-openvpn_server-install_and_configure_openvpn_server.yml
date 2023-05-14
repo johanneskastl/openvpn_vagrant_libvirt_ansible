@@ -1,0 +1,47 @@
+---
+- name: 'Install and configure the OpenVPN server'
+  hosts: openvpn_server
+  gather_facts: true
+  become: true
+
+  tasks:
+
+    - name: 'Install the openVPN package'
+      ansible.builtin.package:
+        name: openvpn
+        state: present
+
+    - name: 'Create the shared secret file'
+      ansible.builtin.command:
+        cmd: 'openvpn --genkey secret /etc/openvpn/secret.key'
+        creates: '/etc/openvpn/secret.key'
+
+    - name: 'Create the openVPN configuration file'
+      ansible.builtin.template:
+        src: 'openvpn-server.conf.j2'
+        dest: '/etc/openvpn/server.conf'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+      notify:
+        - 'Restart the openVPN service'
+
+    - name: 'Start and enable the openVPN service'
+      ansible.builtin.service:
+        name: 'openvpn@server.service'
+        state: 'started'
+        enabled: true
+
+    - name: 'Fetch the secret.key file'
+      ansible.builtin.fetch:
+        src: '/etc/openvpn/secret.key'
+        dest: secret.key
+        mode: '0600'
+        flat: true
+
+  handlers:
+
+    - name: 'Restart the openVPN service'
+      ansible.builtin.service:
+        name: 'openvpn@server.service'
+        state: 'restarted'
